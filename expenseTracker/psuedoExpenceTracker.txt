@@ -1,0 +1,13 @@
+Expence tracker Psuedo Code
+
+At startup:
+Menu with selections
+1. Signip function
+2. Login function
+3. Exit option
+
+While loop to keep this running util and option is selected
+
+3. Exits and shuts down the program
+
+
