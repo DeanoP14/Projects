@@ -56,7 +56,8 @@ def signup():
             print("You have registered successfully")
         except sqlite3.IntegrityError:
             print("Error you have already registered! Try logging in instead.")
-        conn.close()
+        finally:
+            conn.close()
     else:
         print("Your passwords do not match!!")
 
@@ -71,13 +72,15 @@ def login():
     conn.close()
 
     if result:
-        stored_password, stored_salt, username = result
+        stored_password, stored_salt = result
         if stored_password == hash_password(pwd, stored_salt):
             print(f"Welcome back to - MyBudgetApp - {username}.")
             ## Create a pause function before proceding to next step
             menu()
         else:
-            print("Login Failed!! Please try again!!")
+            print("Login Failed!! Please try again")
+    else:
+        print("User not found!")
 
 # Funtion that logs the expenses to the database. 
 def log(amount, category, message=""):
@@ -211,8 +214,9 @@ def main_menu():
         if ch == "1":
             signup()
         elif ch == "2":
-            menu()
+            login()
         elif ch == "3":
+            print("Exiting...")
             break
         else:
             print("Wrong choice. Please select the number 1, 2 or 3!!")
