@@ -1,12 +1,18 @@
 import sqlite3
 from datetime import datetime
+import hashlib
+import os
+
+# Hashing password function
+def hash_password(password, salt):
+    return hashlib.sha256(password.encode() + salt.encode()).hexdigest()
 
 # Initialise a new database if it does not exist, to store the expenses.
 def init():
     try:
         conn = sqlite3.connect('budget.db')
         c = conn.cursor()
-        sql = '''
+        expense = '''
         CREATE TABLE IF NOT EXISTS expenses (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             amount INTEGER,
@@ -15,12 +21,44 @@ def init():
             date TEXT
             )
         '''
-        c.execute(sql)
+        users = '''
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT NOT NULL,
+            email TEXT NOT NULL,
+            password TEXT NOT NULL,
+            salt TEXT NOT NULL)
+        '''
+        c.execute(expense)
+        c.execute(users)
         conn.commit()
     except sqlite3.Error as e:
         print(f"Error initializing database: {e}")
     finally:
         conn.close()
+
+# Define the signup process
+def signup():
+    username = input("Please enter the username you would like to use: ")
+    email = input("Please enter your email address: ")
+    pwd = input("Please enter your password: ")
+    conf_pwd = input("Please confirm your password: ")
+
+    # Salting and hashing of password during signup
+    if conf_pwd == pwd:
+        salt = os.urandom(16).hex()
+        hashed_password = hash_password(conf_pwd, salt)
+        conn = sqlite3.connect('budget.db')
+        cursor = conn.cursor()
+        try:
+            cursor.execute('INSERT INTO users (username, email, password, salt) VALUES (?,?,?,?)',(username, email, hashed_password, salt))
+            conn.commit()
+            print("You have registered successfully")
+        except sqlite3.IntegrityError:
+            print("Error you have already registered! Try logging in instead.")
+        conn.close()
+    else:
+        print("Your passwords do not match!!")
 
 # Funtion that logs the expenses to the database. 
 def log(amount, category, message=""):
