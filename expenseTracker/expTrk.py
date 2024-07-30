@@ -12,25 +12,26 @@ def init():
     try:
         conn = sqlite3.connect('budget.db')
         c = conn.cursor()
-        expense = '''
-        CREATE TABLE IF NOT EXISTS expenses (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            amount INTEGER,
-            category TEXT,
-            message TEXT,
-            date TEXT
-            )
-        '''
         users = '''
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT NOT NULL,
-            email TEXT NOT NULL,
+            username TEXT NOT NULL UNIQUE,
+            email TEXT NOT NULL UNIQUE,
             password TEXT NOT NULL,
             salt TEXT NOT NULL)
         '''
-        c.execute(expense)
+        expense = '''
+        CREATE TABLE IF NOT EXISTS expenses (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTERGER,
+            amount INTEGER,
+            category TEXT,
+            message TEXT,
+            date TEXT,
+            FOREIGN KEY (user_id) REFERENCES users(id))
+        '''
         c.execute(users)
+        c.execute(expense)
         conn.commit()
     except sqlite3.Error as e:
         print(f"Error initializing database: {e}")
@@ -67,29 +68,29 @@ def login():
     pwd = input("Please enter your password: ")
     conn = sqlite3.connect('budget.db')
     cursor = conn.cursor()
-    cursor.execute("SELECT password, salt FROM users WHERE username = ?", (username,))
+    cursor.execute("SELECT id, password, salt FROM users WHERE username = ?", (username,))
     result = cursor.fetchone()
     conn.close()
 
     if result:
-        stored_password, stored_salt = result
+        user_id, stored_password, stored_salt = result
         if stored_password == hash_password(pwd, stored_salt):
             print(f"Welcome back to - MyBudgetApp - {username}.")
             ## Create a pause function before proceding to next step
-            menu()
+            menu(user_id)
         else:
             print("Login Failed!! Please try again")
     else:
         print("User not found!")
 
 # Funtion that logs the expenses to the database. 
-def log(amount, category, message=""):
+def log(user_id, amount, category, message=""):
     try:
         date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        data = (amount, category, message, date)
+        data = (user_id, amount, category, message, date)
         conn = sqlite3.connect('budget.db')
         c = conn.cursor()
-        sql = 'INSERT INTO expenses (amount, category, message, date) VALUES (?,?,?,?)'
+        sql = 'INSERT INTO expenses (user_id, amount, category, message, date) VALUES (?,?,?,?,?)'
         c.execute(sql,data)
         conn.commit()
         print("Expenses added successfully.")
@@ -99,14 +100,14 @@ def log(amount, category, message=""):
         conn.close()
 
 # Function to remove a selected expense
-def remove(expense_id):
+def remove(user_id, expense_id):
     try:
         conn = sqlite3.connect('budget.db')
         c = conn.cursor()
-        sql = 'DELETE FROM expenses WHERE id = ?'
-        c.execute(sql, (expense_id,))
+        sql = 'DELETE FROM expenses WHERE id = ? AND user_id = ?'
+        c.execute(sql, (expense_id, user_id))
         if c.rowcount == 0:
-            print("No expense found with that ID.")
+            print("No expense found with that ID for this user.")
         else:
             conn.commit()
             print("Expense removed successfully.")
@@ -116,30 +117,30 @@ def remove(expense_id):
         conn.close()
 
 # Funtion to show a list of the expenses and total expense. Can select specific categories.
-def view(category=None):
+def view(user_id, category=None):
     try:
         conn = sqlite3.connect('budget.db')
         c = conn.cursor()
         if category:
             sql = '''
-            SELECT * FROM expenses WHERE category = ?
+            SELECT * FROM expenses WHERE user_id = ? AND category = ?
             '''
             sql2 = '''
-            SELECT sum(amount) FROM expenses WHERE category = ?
+            SELECT sum(amount) FROM expenses WHERE user_id = ? AND category = ?
             '''
-            c.execute(sql, (category,))
+            c.execute(sql, (user_id, category))
             results = c.fetchall()
-            c.execute(sql2, (category,))
+            c.execute(sql2, (user_id, category))
         else:
             sql = '''
-            SELECT * FROM expenses
+            SELECT * FROM expenses WHERE user_is = ?
             '''
             sql2 = '''
-            SELECT sum(amount) FROM expenses
+            SELECT sum(amount) FROM expenses WHERE user_id = ?
             '''
-            c.execute(sql)
+            c.execute(sql, (user_id,))
             results = c.fetchall()
-            c.execute(sql2)
+            c.execute(sql2, (user_id,))
     
         total_amount = c.fetchone()[0]
         if total_amount is None:
@@ -152,10 +153,8 @@ def view(category=None):
     finally:
         conn.close()
 
-    
-
 # Function to display the menu and handle user input
-def menu():
+def menu(user_id):
     while True:
         print("\nExpense Tracker Menu")
         print("1. Add Expense")
@@ -171,28 +170,28 @@ def menu():
                 amount = int(input("Enter amount: "))
                 category = input("Enter category: ")
                 message = input("Enter message (optional): ")
-                log(amount, category, message)
+                log(user_id, amount, category, message)
                 print("Expense added successfully.")
             except ValueError:
                 print("Invalid input for amount. Please enter a number.")
         elif choice == '2':
             try:
                 expense_id = int(input("Enter the ID of the expense to remove: "))
-                remove(expense_id)
+                remove(user_id, expense_id)
                 print("Expense removed successfully.")
             except ValueError:
                 print("Invalid input for expense ID. Please enter a number.")
         elif choice == '3':
-            total, expenses = view()
+            total, expenses = view(user_id)
             print(f"\nTotal Expenses: {total}")
             for expense in expenses:
                 print(expense)
         elif choice == '4':
-            total, _ = view()
+            total, _ = view(user_id)
             print(f"\nTotal Expenses: {total}")
         elif choice == '5':
             category = input("Enter category: ")
-            total, expenses = view(category)
+            total, expenses = view(user_id, category)
             print(f"\nTotal {category} Expenses: {total}")
             for expense in expenses:
                 print(expense)
