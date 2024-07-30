@@ -60,6 +60,25 @@ def signup():
     else:
         print("Your passwords do not match!!")
 
+# Define the login process for this application
+def login():
+    username = input("Enter your username: ")
+    pwd = input("Please enter your password: ")
+    conn = sqlite3.connect('budget.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT password, salt FROM users WHERE username = ?", (username,))
+    result = cursor.fetchone()
+    conn.close()
+
+    if result:
+        stored_password, stored_salt, username = result
+        if stored_password == hash_password(pwd, stored_salt):
+            print(f"Welcome back to - MyBudgetApp - {username}.")
+            ## Create a pause function before proceding to next step
+            menu()
+        else:
+            print("Login Failed!! Please try again!!")
+
 # Funtion that logs the expenses to the database. 
 def log(amount, category, message=""):
     try:
@@ -180,6 +199,26 @@ def menu():
         else:
             print("Invalid choice, please try again.")
 
+# Define application main menu at startup
+def main_menu():
+    while True:
+        print("********** - MyBudgetApp - **********")
+        print("1. Signup")
+        print("2. Login")
+        print("3. Exit")
+        ch = input("Please enter your choice: ")
+
+        if ch == "1":
+            signup()
+        elif ch == "2":
+            menu()
+        elif ch == "3":
+            break
+        else:
+            print("Wrong choice. Please select the number 1, 2 or 3!!")
+
+
 if __name__ == "__main__":
     init()
-    menu()
+    main_menu()
+    
