@@ -1,0 +1,80 @@
+[
+  {
+    "nodes" : [
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{38, 46}, {150, 212}}",
+        "class" : "ImageView",
+        "attributes" : {
+          "frame" : "{{70, 70}, {100, 100}}",
+          "class" : "ImageView",
+          "name" : "imageview1",
+          "uuid" : "987AC48F-D246-44A8-8D30-B2D4285DC66A"
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{38, 6}, {150, 32}}",
+        "class" : "Label",
+        "attributes" : {
+          "name" : "label1",
+          "frame" : "{{45, 104}, {150, 32}}",
+          "uuid" : "9F4B7EAF-B051-40EC-8BC5-B9EE9F5FBA43",
+          "class" : "Label",
+          "alignment" : "left",
+          "text" : "Label",
+          "font_size" : 18,
+          "font_name" : "<System>"
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{38, 53}, {57, 20}}",
+        "class" : "Button",
+        "attributes" : {
+          "uuid" : "84350436-4FF9-4D91-85E8-4C7E9E5100A3",
+          "frame" : "{{76, 116}, {80, 32}}",
+          "title" : "Button",
+          "class" : "Button",
+          "name" : "button1",
+          "font_size" : 15
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{133, 53}, {55, 20}}",
+        "class" : "Button",
+        "attributes" : {
+          "uuid" : "310D8CBA-4AC6-4B99-B86D-822A15E1D810",
+          "frame" : "{{76, 116}, {80, 32}}",
+          "title" : "Button",
+          "class" : "Button",
+          "name" : "button2",
+          "font_size" : 15
+        },
+        "selected" : false
+      }
+    ],
+    "frame" : "{{0, 0}, {232, 264}}",
+    "class" : "View",
+    "attributes" : {
+      "enabled" : true,
+      "background_color" : "RGBA(1.000000,1.000000,1.000000,1.000000)",
+      "tint_color" : "RGBA(0.000000,0.478000,1.000000,1.000000)",
+      "border_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
+      "flex" : ""
+    },
+    "selected" : false
+  }
+]
