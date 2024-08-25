@@ -7,7 +7,7 @@ def init_db():
 		conn = sqlite3.connect('budget.db')
 		c = conn.cursor()
 		sql = '''
-		CREATE TABLE IS NOT EXISTS expenses (
+		CREATE TABLE IF NOT EXISTS expenses (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
 			amount DECIMAL NOT NULL,
 			category TEXT NOT NULL,
