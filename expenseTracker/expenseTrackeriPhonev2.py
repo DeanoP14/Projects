@@ -11,7 +11,7 @@ def init_db():
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
 			amount DECIMAL NOT NULL,
 			category TEXT NOT NULL,
-			message TEXT NOT NULL,
+			message TEXT,
 			date TEXT NOT NULL
 			)
 		'''
@@ -21,7 +21,6 @@ def init_db():
 		print(f"Error initializing database: {e}")
 	finally:
 		conn.close
-
 
 # Create the main window view for the application
 class MainView(ui.View):
