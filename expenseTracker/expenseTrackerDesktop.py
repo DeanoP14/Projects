@@ -38,6 +38,10 @@ def create_main_window():
     # Use grid to place the button and center it (3x3 grid for flexibility)
     add_button.grid(row=0, column=0, padx=10, pady=10)
 
+    # Create a button to view all saved expenses
+    view_button = tk.Button(window, text="View Expenses", command=show_expense_history)
+    view_button.grid(row=1, column=0, padx=10, pady=10)
+
     # Configure the grid system
     window.grid_columnconfigure(0, weight=1)
     window.grid_columnconfigure(1, weight=1)
@@ -96,6 +100,36 @@ def save_expense(amount, category, message):
         messagebox.showerror("Database Error", f"Error logging expense: {e}")
     finally:
         conn.close
+
+# Function to retireive and display expenses from the database
+def show_expense_history():
+    try:
+        conn = sqlite3.connect('budget.db')
+        c = conn.cursor()
+        # Fetch all expenses
+        c.execute('SELECT amount, category, message, date FROM expenses')
+        expenses = c.fetchall()
+        conn.close
+
+        # Create new window to show expenses
+        history_window = tk.Toplevel()
+        history_window.title('Expense History')
+        history_window.geometry("400x300")
+
+        # If no expenses display an error message
+        if not expenses:
+            tk.Label(history_window, text="No expense recorded yet!").pack(pady=20)
+            return
+
+        # Display the expenses
+        for expense in expenses:
+            amount, category, message, date = expense
+            expense_text = f"{date}: {category} - ${amount} ({message})"
+            tk.Label(history_window, text=expense_text).pack(anchor="w", padx=10, pady=5)
+
+    except sqlite3.Error as e:
+        messagebox.showerror("Error", f"Failed to retrieve expenses: {e}")
+
 
 # Start the application
 create_main_window()
