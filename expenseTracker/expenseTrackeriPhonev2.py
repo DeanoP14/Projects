@@ -165,15 +165,6 @@ class MainView(ui.View):
 			
 		finally:
 			conn.close()
-		
-	def select_category(self, sender):
-		selected_row = sender.items[sender.selected_row]
-		self.category_button.title = selected_row
-		self.select_category = selected_row
-		
-		# Close the popover after selection
-		if hasattr(self, 'category_dropdown'):
-			self.category_dropdown.close()
 				
 	def will_close(self):
 		print("MainView is closing")
