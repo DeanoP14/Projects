@@ -143,10 +143,11 @@ class MainView(ui.View):
 			history_view = ui.View()
 			history_view.background_color = 'white'
 			
-			# Create a textview to display the expense history
-			history_text = ui.TextView()
-			history_text.editable = False 
-			history_text.font = ('<system>', 16)
+			# Create a table view to display expenses
+			expense_table = ui.TableView()
+			expense_table.width = history_view.width
+			expense_table.height = history_view.height - 100
+			expense_table.flex = 'WH'
 			
 			# Format and display expenses
 			history_content = ""
